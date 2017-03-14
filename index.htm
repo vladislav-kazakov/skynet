@@ -1,0 +1,27 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="style.css" />
+
+<script type="application/javascript" src="common.js"></script>
+<script type="application/javascript" src="greencell.js"></script>
+<script type="application/javascript" src="animalcell.js"></script>
+<script type="application/javascript" src="predatorcell.js"></script>
+</head>
+<body>
+		<div id="container">
+			<div id="left-content">
+				<p>Day: <span id="counter">0</span>
+				<span style="display:inline-block;width:20px;"></span>Green population: <span id="greenPopulation">0</span>
+				<span style="display:inline-block;width:30px;"></span>Animal population: <span id="animalPopulation">0</span>
+				<span style="display:inline-block;width:20px;"></span>Predator population: <span id="predatorPopulation">0</span>				
+				</p>
+				<canvas id="grid" width="577" height="321"></canvas>
+			</div>
+			<div id="right-content">
+				<h2>Controls</h2>
+				<a id="controlLink" href="javascript:void(0)">Start/Stop</a><br />
+				<a id="clearLink" href="javascript:void(0)">Clear Grid</a><br />
+				<a id="createGrassLink" href="javascript:void(0)">Create Grass</a>			</div>
+		</div>
+</body>
+</html>
