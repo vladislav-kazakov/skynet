@@ -110,7 +110,7 @@ function search(x, y)
 function newDay()
 {
 	LifeCycle();
-	//redraw();
+	redraw();
 }
 
 var action = 0;
