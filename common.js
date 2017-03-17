@@ -110,7 +110,7 @@ function search(x, y)
 function newDay()
 {
 	LifeCycle();
-	redraw();
+	//redraw();
 }
 
 var action = 0;
@@ -190,6 +190,14 @@ function canvasOnRightClickHandler(event) {
 	redraw();
 	return false;
 };
+function canvasOnMouseOverHandler(event) {
+	var positionX = getCursorPositionX(event);
+	var positionY = getCursorPositionY(event);
+	cell = searchAnimalCell(positionX, positionY);
+	if (cell != null) genomCodeSpan.innerHTML = cell.GenomAsString();
+	else genomCodeSpan.innerHTML = "";
+	return false;
+};
 
 function getCursorPositionX(event) {
 	var x;
@@ -216,170 +224,83 @@ function getCursorPositionY(event) {
 
 
 					
-document.addEventListener("DOMContentLoaded", 
-function() {
-gridCanvas = document.getElementById('grid');					
-counterSpan = document.getElementById("counter");
-greenPopulationSpan = document.getElementById("greenPopulation");
-animalPopulationSpan = document.getElementById("animalPopulation");
-predatorPopulationSpan = document.getElementById("predatorPopulation");
-controlLink = document.getElementById("controlLink");
-clearLink = document.getElementById("clearLink");
-createGrassLink = document.getElementById("createGrassLink");
-minimumSelect = document.getElementById("minimumSelect");
-maximumSelect = document.getElementById("maximumSelect");
-spawnSelect = document.getElementById("spawnSelect");	
+document.addEventListener("DOMContentLoaded", function() {
+	gridCanvas = document.getElementById('grid');					
+	counterSpan = document.getElementById("counter");
+	greenPopulationSpan = document.getElementById("greenPopulation");
+	animalPopulationSpan = document.getElementById("animalPopulation");
+	predatorPopulationSpan = document.getElementById("predatorPopulation");
+	genomCodeSpan = document.getElementById("genomCode");
+	genomSpan = document.getElementById("genom");
+	controlLink = document.getElementById("controlLink");
+	speedLink = document.getElementById("speedLink");
+	clearLink = document.getElementById("clearLink");
+	createGrassLink = document.getElementById("createGrassLink");
+	minimumSelect = document.getElementById("minimumSelect");
+	maximumSelect = document.getElementById("maximumSelect");
+	spawnSelect = document.getElementById("spawnSelect");	
 
-gridCanvas.addEventListener("click", canvasOnClickHandler, false);
-gridCanvas.oncontextmenu = function(e){canvasOnRightClickHandler(e); return false;};
-
-controlLink.onclick = function() {
-			switch (gameState) {
-			case STOPPED:
-				gameInterval = setInterval(function() {
-					newDay();
-				}, DELAY);
-				gameState = RUNNING;
-				break;
-			default:
-				clearInterval(gameInterval);
-				gameState = STOPPED;
-			}
-		};
-		
-		clearLink.onclick = function() {
-			cells = new Array();
-			redraw();
-		}	
-		createGrassLink.onclick = function() {
-			cells = new Array();
-			for (var i = 0; i < WIDTH; i++){
-				for (var j = 0; j < HEIGHT; j++){
-					spawnGreenCell(i, j);
-				}	
-			}
-			redraw();
-		}	
+	gridCanvas.addEventListener("click", canvasOnClickHandler, false);
+	gridCanvas.oncontextmenu = function(e){canvasOnRightClickHandler(e); return false;};
+	gridCanvas.addEventListener("mousemove", canvasOnMouseOverHandler, false);
 	
-/*	matrix = function (m, n, initial) {
-		var a, i, j, mat = [];
-		for (i = 0; i < m; i += 1) {
-			a = [];
-			for (j = 0; j < n; j += 1) {
-				a[j] = 0;
-			}
-			mat[i] = a;
+	controlLink.onclick = function() {
+		switch (gameState) {
+		case STOPPED:
+			gameInterval = setInterval(function() {
+				newDay();
+			}, DELAY);
+			gameState = RUNNING;
+			break;
+		default:
+			clearInterval(gameInterval);
+			gameState = STOPPED;
 		}
-		return mat;
-	};
-					
-					
-					
-					
-					var Life = {};
+	}
+	speedLink.onclick = function() {
+		if (DELAY == 0) DELAY = 100;
+		else DELAY = 0;
+		clearInterval(gameInterval);
+		gameInterval = setInterval(function() {
+				newDay();
+			}, DELAY);
+	}
+			
+	clearLink.onclick = function() {
+		cells = new Array();
+		redraw();
+	}	
+
+	createGrassLink.onclick = function() {
+		cells = new Array();
+		for (var i = 0; i < WIDTH; i++){
+			for (var j = 0; j < HEIGHT; j++){
+				spawnGreenCell(i, j);
+			}	
+		}
+		redraw();
+	}	
 		
-					
-					Life.state = Life.STOPPED;
-					Life.interval = null;
-					
-					Life.grid = matrix(Life.HEIGHT, Life.WIDTH, 0);
-										
-					Life.counter = 0;
-									
-					Life.updateState = function() {
-						var neighbours;
-						
-						var nextGenerationGrid = matrix(Life.HEIGHT, Life.WIDTH, 0);
-						
-						for (var h = 0; h < Life.HEIGHT; h++) {
-							for (var w = 0; w < Life.WIDTH; w++) {
-								neighbours = Life.calculateNeighbours(h, w);
-								if (Life.grid[h][w] !== Life.DEAD) {
-									if ((neighbours >= Life.minimum) && (neighbours <= Life.maximum)) {
-										nextGenerationGrid[h][w] = Life.ALIVE;
-									}
-								} else {
-									if (neighbours === Life.spawn) {
-										nextGenerationGrid[h][w] = Life.ALIVE;
-									}
-								}
-							}
-						}
-						Life.copyGrid(nextGenerationGrid, Life.grid);
-						Life.counter++;
-					};
-									
-					Life.calculateNeighbours = function(y, x) {				
-						var total = (Life.grid[y][x] !== Life.DEAD) ? -1 : 0;
-						for (var h = -1; h <= 1; h++) {
-							for (var w = -1; w <= 1; w++) {
-								if (Life.grid[(Life.HEIGHT + (y + h)) % Life.HEIGHT][(Life.WIDTH + (x + w)) % Life.WIDTH] !== Life.DEAD) {
-									total++;
-								}
-							}
-						}
-						return total;
-					};
 
-					Life.copyGrid = function(source, destination) {
-						for (var h = 0; h < Life.HEIGHT; h++) {
+	if (gridCanvas.getContext) {
+		context = gridCanvas.getContext('2d');
+		var offset = CELL_SIZE;
 
-							destination[h] = source[h].slice(0);
-						}
-					};
+		for (var x = 0; x <= X; x += CELL_SIZE) {
+			context.moveTo(0.5 + x, 0);
+			context.lineTo(0.5 + x, Y);
+		}
+		for (var y = 0; y <= Y; y += CELL_SIZE) {
+			context.moveTo(0, 0.5 + y);
+			context.lineTo(X, 0.5 + y);
+		}
+		context.strokeStyle = "#fff";
+		context.stroke();
+		redraw();
 		
-					
-					function update() {
-						Life.updateState();
-					    //updateInput();
-					    //updateAI();
-					    //updatePhysics();
-					    updateAnimations();
-					    //updateSound();
-					    //updateVideo();
-					};
-					
-					function updateAnimations() {
-						for (var h = 0; h < Life.HEIGHT; h++) {
-							for (var w = 0; w < Life.WIDTH; w++) {
-								if (Life.grid[h][w] === Life.ALIVE) {
-									context.fillStyle = "#000";									
-								} else {
-									context.fillStyle = "#eee";
-									//context.clearRect();
-								}
-								context.fillRect(
-										w * Life.CELL_SIZE +1, 
-										h * Life.CELL_SIZE +1, 
-										Life.CELL_SIZE -1,
-										Life.CELL_SIZE -1);
-							}
-						}
-						counterSpan.innerHTML = Life.counter;	
-					};
-	*/				
-					if (gridCanvas.getContext) {
-						context = gridCanvas.getContext('2d');
-						var offset = CELL_SIZE;
-					
-						for (var x = 0; x <= X; x += CELL_SIZE) {
-							context.moveTo(0.5 + x, 0);
-							context.lineTo(0.5 + x, Y);
-						}
-						for (var y = 0; y <= Y; y += CELL_SIZE) {
-							context.moveTo(0, 0.5 + y);
-							context.lineTo(X, 0.5 + y);
-						}
-						context.strokeStyle = "#fff";
-						context.stroke();
-						redraw();
-						
 
-					} else {
-						alert("Canvas is unsupported in your browser.");
-					}
+	} else {
+		alert("Canvas is unsupported in your browser.");
+	}
 					
-  }
-  
-  
-);
+});

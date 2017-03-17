@@ -7,52 +7,131 @@ function AnimalCell(x, y) {
 	this.age = 0;
 	this.state = 0;
 	this.FERTILE_MIN_AGE = 5;
+	this.genPos = 0;
+	this.gen = "01024003";
 }
-AnimalCell.ParseGen(gen)
+AnimalCell.prototype.GenomAsString = function ()
 {
+	this.genPos = 0;
+	var code = "";
+	try{
+	while (seq = this.ReadGenSequence(false)) code += "<br>" + seq;
+	}catch(e){}
+	return code;	
+}
+AnimalCell.prototype.ReadNextGenItem = function()
+{
+	if (this.genPos >= this.gen.length) return null;
+	var item = this.gen[this.genPos];
+	this.genPos++;
+	return item;
+}
+AnimalCell.prototype.MutateGen = function()
+{
+	//this.gen[0] = 9;
+	var chance = Math.random();
+	for(var i = 0; i< this.gen.length; i++)
+	{
+		chance = Math.random();
+		while (chance > 0.95)
+		{
+			this.gen = [this.gen.slice(0, i), Math.floor(Math.random() * 10)%10, this.gen.slice(i)].join('');
+			chance = Math.random();
+		}
+		if (Math.random()>0.95) 
+		{
+			this.gen = this.gen.substr(0, i) + Math.floor(Math.random() * 10)%10 + this.gen.substr(i + 1);
+		}
+		if (Math.random()>0.95) 
+		{
+			this.gen = this.gen.substr(0, i) + this.gen.substr(i + 1);
+		}		
+	}
+	chance = Math.random();	
+	while (chance > 0.95)
+	{
+		this.gen = this.gen + Math.floor(Math.random() * 10)%10;
+		chance = Math.random();
+	}
+}
+AnimalCell.prototype.ReadGenSequence = function(cycle)
+{
+	if (!cycle && this.genPos >= this.gen.length) return null;
 	var program = "";
-	switch (gen[0]%2){
-	case '0': 
+	switch (parseInt(this.ReadNextGenItem())%3){
+	case 1: 
 		program +="if(";
-		switch (gen[1]%7){
-		case "0":
-			program += "lookForGreenCell(" + gen[2] + gen[3] + "," + gen[4]+")";
+		switch (parseInt(this.ReadNextGenItem())%7){
+		case 0:
+			program += "this.lookForGreenCell(" + (parseInt(this.ReadNextGenItem())*10 + parseInt(this.ReadNextGenItem()))*7/100 + "," + this.ReadNextGenItem() +")";
 			break;
-		case "1":
-			program += "lookForAnimalCell(" + gen[2] + gen[3] + "," + gen[4]+")";
+		case 1:
+			program += "this.lookForAnimalCell(" + (parseInt(this.ReadNextGenItem())*10 + parseInt(this.ReadNextGenItem()))*7/100 + "," + this.ReadNextGenItem() +")";
 			break;
-		case "2":
-			program += "lookForPredatorCell(" + gen[2] + gen[3] + "," + gen[4]+")";
+		case 2:
+			program += "this.lookForPredatorCell(" + (parseInt(this.ReadNextGenItem())*10 + parseInt(this.ReadNextGenItem()))*7/100 + "," + this.ReadNextGenItem() +")";
 			break;	
-		case "3":
-			program += "this.fat <= " + gen[2] + gen[3] + gen[4];
+		case 3:
+			program += "this.fat <= " + this.ReadNextGenItem() + this.ReadNextGenItem();
 			break;		
-		case "4":
-			program += "this.fat >= " + gen[2] + gen[3] + gen[4];
+		case 4:
+			program += "this.fat >= " + this.ReadNextGenItem() + this.ReadNextGenItem();
 			break;			
-		case "5":
-			program += "this.age <= " + gen[2] + gen[3] + gen[4];
+		case 5:
+			program += "this.age <= " + this.ReadNextGenItem() + this.ReadNextGenItem();
 			break;		
-		case "6":
-			program += "this.age >= " + gen[2] + gen[3] + gen[4];
+		case 6:
+			program += "this.age >= " + this.ReadNextGenItem() + this.ReadNextGenItem();
 			break;	
 		}
-		program += ")";
+		program += ")" + this.ReadGenSequence(cycle);
 		break;
-	case '1': 
-		switch (gen[1]%3){
-		case "0":
-			program += "breed(" + gen[2] + gen[3] ");";
+	case 2: 
+		program +="if(!(";
+		switch (parseInt(this.ReadNextGenItem())%7){
+		case 0:
+			program += "this.lookForGreenCell(" + (parseInt(this.ReadNextGenItem())*10 + parseInt(this.ReadNextGenItem()))*7/100 + "," + this.ReadNextGenItem() +")";
 			break;
-		case "1":
-			program += "eat(" + gen[2] + gen[3] ");";
+		case 1:
+			program += "this.lookForAnimalCell(" + (parseInt(this.ReadNextGenItem())*10 + parseInt(this.ReadNextGenItem()))*7/100 + "," + this.ReadNextGenItem() +")";
 			break;
-		case "2":
-			program += "move(" + gen[2] + gen[3] ");";
+		case 2:
+			program += "this.lookForPredatorCell(" + (parseInt(this.ReadNextGenItem())*10 + parseInt(this.ReadNextGenItem()))*7/100 + "," + this.ReadNextGenItem() +")";
+			break;	
+		case 3:
+			program += "this.fat <= " + this.ReadNextGenItem() + this.ReadNextGenItem();
+			break;		
+		case 4:
+			program += "this.fat >= " + this.ReadNextGenItem() + this.ReadNextGenItem();
+			break;			
+		case 5:
+			program += "this.age <= " + this.ReadNextGenItem() + this.ReadNextGenItem();
+			break;		
+		case 6:
+			program += "this.age >= " + this.ReadNextGenItem() + this.ReadNextGenItem();
+			break;	
+		}
+		program += "))" + this.ReadGenSequence(cycle);
+		break;
+	case 0: 
+		switch (parseInt(this.ReadNextGenItem()) %3){
+		case 0:
+			//program += "dobreed(" + (parseInt(gen[2])*10 + parseInt(gen[3]))*7/100 + ");";
+			program += "this.breed();";
+			break;
+		case 1:
+			//program += "doeat(" + (parseInt(gen[2])*10 + parseInt(gen[3]))*7/100 + ");";
+			program += "this.eat();";
+			break;
+		case 2:
+			//program += "domove(" + (parseInt(gen[2])*10 + parseInt(gen[3]))*7/100 + ");";
+			program += "this.moveSimple(" + Math.floor((parseInt(this.ReadNextGenItem())*10 + parseInt(this.ReadNextGenItem()))*7/100) + ");";
 			break;	
 		}
 		break;
 	}
+	if (cycle && this.genPos >= this.gen.length) this.genPos = 0;
+	return program;
 }
 AnimalCell.prototype.sleep = function()
 {
@@ -82,6 +161,15 @@ AnimalCell.prototype.move = function()
 	var direction = getDirection(left, top);
 	if (direction == null) direction = Math.round(Math.random() * 9)-1;
 	if (direction<0 || direction>7) return;
+	if (this.lookForAnimalCell(direction)!= null) return;
+	this.posX = getX(this.posX, direction);
+	this.posY = getY(this.posY, direction);	
+	this.fat-= 1;
+}
+AnimalCell.prototype.moveSimple = function(direction)
+{
+	if (this.fat>=10) return;
+	if (this.age == 0) return;
 	if (this.lookForAnimalCell(direction)!= null) return;
 	this.posX = getX(this.posX, direction);
 	this.posY = getY(this.posY, direction);	
@@ -142,12 +230,12 @@ AnimalCell.prototype.eat = function()
 	var unsorted = unsortedDirections();
 	for (var direction=0; direction<=7; direction++)
 	{
-		if (eaten >= 3) return;
+		//if (eaten >= 3) return;
 		if (this.fat>=6) return;
 		if (this.lookForGreenCell(unsorted[direction]) != null)
 		{
 			eaten++;
-			this.fat+=2;
+			this.fat+=1;
 			removeGreenCell(getX(this.posX, unsorted[direction]), getY(this.posY, unsorted[direction]));
 		}
 	}
@@ -155,7 +243,7 @@ AnimalCell.prototype.eat = function()
 
 AnimalCell.prototype.breed = function()
 {
-	if (this.fat <= 3) return;
+	//if (this.fat <= 3) return;
 	if (this.age <= 10) return;	
 	var seed = [0,0,0,0,0,0,0,0];
 	for (var direction=0; direction<=7; direction++)
@@ -171,14 +259,19 @@ AnimalCell.prototype.breed = function()
 	}
 	for (var direction=0; direction<=7; direction++)
 	{
-		if (seed[direction]>=1 && this.lookForAnimalCell(direction)==null && Math.random()>0.95){
-			spawnAnimalCell(getX(this.posX, direction), getY(this.posY, direction));
+		if (seed[direction]>=1 && this.lookForAnimalCell(direction)==null && Math.random()>0.1){
+			let newcell = spawnAnimalCell(getX(this.posX, direction), getY(this.posY, direction));
+			newcell.gen = this.gen;
 			this.fat-= 1;
 		}
 	}
 }
 AnimalCell.prototype.grow = function()
 {
+	if (this.age == 0){
+		this.MutateGen();
+		genomSpan.innerHTML = this.gen;
+	}
 	this.age++;
 	this.fat-= 1;
 }
@@ -195,36 +288,26 @@ AnimalCell.prototype.draw = function() {
 
 AnimalCell.prototype.program = function()
 {
-	switch (this.state)
-	{
-	case 0:
-		this.grow();
-		break;
-	case 1:
-		this.eat();
-		break;
-	case 2:
-		this.moveBreed();
-		this.breed();
-		break;
-	case 3:
-		this.sleep();
-		break;
-	case 4:
-		this.rot();
-		break;	
-	case 5:
-		this.move();
-		break;			
+	if (this.state == 0) this.grow();
+	try{
+		eval(this.ReadGenSequence(true));
 	}
+	catch(e){}
 	this.state++;
-	if (this.state == 6) this.state = 0;
+	if (this.state == 6) 
+	{
+		this.state = 0;
+		this.sleep();
+		this.rot();
+	}
 }
 
 function spawnAnimalCell(x,y)
 {
 	if (searchAnimalCell(x, y) != null) return false;
-	cells.push(new AnimalCell(x, y));
+	var cell = new AnimalCell(x, y);
+	cells.push(cell);
+	return cell;
 }
 function removeAnimalCell(x,y)
 {

@@ -6,7 +6,7 @@ function PredatorCell(x, y) {
 	this.fat = 10;
 	this.age = 0;
 	this.state = 0;
-	this.FERTILE_MIN_AGE = 10;
+	this.FERTILE_MIN_AGE = 5;
 }
 PredatorCell.prototype.sleep = function()
 {
