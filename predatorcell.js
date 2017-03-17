@@ -12,7 +12,7 @@ PredatorCell.prototype.sleep = function()
 {
 	if (this.age == 0) return;
 	if (this.fat>=1) this.fat -= 0;
-	else this.alive = false;
+	//else this.alive = false;
 	if (Math.random()<this.age * this.age/160000) this.alive = false;
 }
 PredatorCell.prototype.move = function()
@@ -165,8 +165,8 @@ PredatorCell.prototype.program = function()
 		this.eat();
 		break;
 	case 2:
-		this.moveBreed();
-		this.breed();
+		//this.moveBreed();
+		//this.breed();
 		break;
 	case 3:
 		this.sleep();

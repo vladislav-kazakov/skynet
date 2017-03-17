@@ -8,7 +8,7 @@ function AnimalCell(x, y) {
 	this.state = 0;
 	this.FERTILE_MIN_AGE = 5;
 	this.genPos = 0;
-	this.gen = "01024003";
+	this.gen = "01024034";
 }
 AnimalCell.prototype.GenomAsString = function ()
 {
@@ -121,11 +121,11 @@ AnimalCell.prototype.ReadGenSequence = function(cycle)
 			break;
 		case 1:
 			//program += "doeat(" + (parseInt(gen[2])*10 + parseInt(gen[3]))*7/100 + ");";
-			program += "this.eat();";
+			program += "this.eatSimple();";
 			break;
 		case 2:
 			//program += "domove(" + (parseInt(gen[2])*10 + parseInt(gen[3]))*7/100 + ");";
-			program += "this.moveSimple(" + Math.floor((parseInt(this.ReadNextGenItem())*10 + parseInt(this.ReadNextGenItem()))*7/100) + ");";
+			program += "this.moveSimple(" + Math.floor(parseInt(this.ReadNextGenItem())*8/10)%8 + ");";
 			break;	
 		}
 		break;
@@ -209,19 +209,20 @@ AnimalCell.prototype.rot = function()
 }
 AnimalCell.prototype.lookForAnimalCell = function(direction)
 {
-	return something = searchAnimalCell(getX(this.posX, direction), getY(this.posY, direction));
+	return searchAnimalCell(getX(this.posX, direction), getY(this.posY, direction));
 }
 AnimalCell.prototype.lookRangedForAnimalCell = function(direction, range)
 {
-	return something = searchAnimalCell(getRangedX(this.posX, direction, range), getRangedY(this.posY, direction,range));
+	return searchAnimalCell(getRangedX(this.posX, direction, range), getRangedY(this.posY, direction,range));
 }
 AnimalCell.prototype.lookForGreenCell = function(direction)
 {
-	return something = searchGreenCell(getX(this.posX, direction), getY(this.posY, direction));
+	if (direction == -1) return searchGreenCell(this.posX, this.posY);
+	return searchGreenCell(getX(this.posX, direction), getY(this.posY, direction));
 }
 AnimalCell.prototype.lookRangedForGreenCell = function(direction, range)
 {
-	return something = searchGreenCell(getRangedX(this.posX, direction, range), getRangedY(this.posY, direction,range));
+	return searchGreenCell(getRangedX(this.posX, direction, range), getRangedY(this.posY, direction,range));
 }
 AnimalCell.prototype.eat = function()
 {//return;
@@ -238,6 +239,17 @@ AnimalCell.prototype.eat = function()
 			this.fat+=1;
 			removeGreenCell(getX(this.posX, unsorted[direction]), getY(this.posY, unsorted[direction]));
 		}
+	}
+}
+
+AnimalCell.prototype.eatSimple = function(direction)
+{//return;
+	if (this.age == 0) return;
+	if (this.fat>=6) return;
+	if (this.lookForGreenCell(-1) != null)
+	{
+		this.fat+=2;
+		removeGreenCell(this.posX, this.posY);
 	}
 }
 
