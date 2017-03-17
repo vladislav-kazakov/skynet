@@ -37,7 +37,7 @@ GreenCell.prototype.breed = function()
 	var seed = [0,0,0,0,0,0,0,0];
 	for (var direction=0; direction<=7; direction++)
 	{
-		if (this.lookForGreenCell(direction)==null && Math.random()>0.9)
+		if (this.lookForGreenCell(direction)==null && Math.random()>0.95)
 		{
 			spawnGreenCell(getX(this.posX, direction), getY(this.posY, direction));
 		}

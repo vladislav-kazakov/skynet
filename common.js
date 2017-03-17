@@ -47,6 +47,25 @@ function unsortedDirections()
 	//console.log(array);
     return array;
 }
+function randomNearDirection() //0,1,2,3,4,5,6,7
+{
+	var r = Math.random(); //[0,1) real
+	r *= 8; //[0,8) real
+	r = Math.floor(r);
+	return r;
+}
+function twoDigitsNumToNearDirection(num /*[0,99]*/) 
+{
+	var num = num / 100 * 8; //[0,7.92]
+	num = Math.floor(num);
+	return num;
+}
+function twoDigitsNumToDirection(num /*[0,99]*/) 
+{
+	var num = num / 100 * 8; //[0,7.92]
+	return num;
+}
+
 function getDirection(dx,dy)
 {
 	let left = dx==0 ? 0 : dx/Math.abs(dx);

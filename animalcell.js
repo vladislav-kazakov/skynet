@@ -8,7 +8,7 @@ function AnimalCell(x, y) {
 	this.state = 0;
 	this.FERTILE_MIN_AGE = 5;
 	this.genPos = 0;
-	this.gen = "01024034";
+	this.gen = "010240034";
 }
 AnimalCell.prototype.GenomAsString = function ()
 {
@@ -125,7 +125,7 @@ AnimalCell.prototype.ReadGenSequence = function(cycle)
 			break;
 		case 2:
 			//program += "domove(" + (parseInt(gen[2])*10 + parseInt(gen[3]))*7/100 + ");";
-			program += "this.moveSimple(" + Math.floor(parseInt(this.ReadNextGenItem())*8/10)%8 + ");";
+			program += "this.moveSimple(" + twoDigitsNumToNearDirection(parseInt(this.ReadNextGenItem())*10 + parseInt(this.ReadNextGenItem())) + ");";
 			break;	
 		}
 		break;
@@ -170,7 +170,7 @@ AnimalCell.prototype.moveSimple = function(direction)
 {
 	if (this.fat>=10) return;
 	if (this.age == 0) return;
-	if (this.lookForAnimalCell(direction)!= null) return;
+	//if (this.lookForAnimalCell(direction)!= null) return;
 	this.posX = getX(this.posX, direction);
 	this.posY = getY(this.posY, direction);	
 	this.fat-= 1;
@@ -245,7 +245,7 @@ AnimalCell.prototype.eat = function()
 AnimalCell.prototype.eatSimple = function(direction)
 {//return;
 	if (this.age == 0) return;
-	if (this.fat>=6) return;
+	if (this.fat>=12) return;
 	if (this.lookForGreenCell(-1) != null)
 	{
 		this.fat+=2;
@@ -271,7 +271,7 @@ AnimalCell.prototype.breed = function()
 	}
 	for (var direction=0; direction<=7; direction++)
 	{
-		if (seed[direction]>=1 && this.lookForAnimalCell(direction)==null && Math.random()>0.1){
+		if (seed[direction]>=1 && this.lookForAnimalCell(direction)==null && Math.random()>0.2){
 			let newcell = spawnAnimalCell(getX(this.posX, direction), getY(this.posY, direction));
 			newcell.gen = this.gen;
 			this.fat-= 1;
